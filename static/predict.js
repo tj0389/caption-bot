@@ -45,24 +45,21 @@ var imageDisplay = document.getElementById("image-display");
 var uploadCaption = document.getElementById("upload-caption");
 var predResult = document.getElementById("pred-result2");
 var loader = document.getElementById("loader");
-var model1 = undefined;
-var model2 = undefined;
 
 //========================================================================
 // Main button events
 //========================================================================
 
-loaded=0;
+let model1;
+let model2;
+(async function () {
+    model1 = await tf.loadLayersModel('/model1/model.json');
+    model2 = await tf.loadLayersModel('/model2/model.json');
+    console.log("MODEL LOADED");    
+})();
 
 async function predict() {
   
-  if (loaded==0){
-    model1 = await tf.loadLayersModel('/model1/model.json');
-    model2 = await tf.loadLayersModel('/model2/model.json');
-    console.log("MODEL LOADED");
-    loaded=1;
-  }
-
   // action for the submit button
   if (!imageDisplay.src || !imageDisplay.src.startsWith("data")) {
     window.alert("Please select an image before submit.");
@@ -73,6 +70,7 @@ async function predict() {
   tensorImg=tf.reverse(tensorImg, -1);
   let offset = tf.scalar(127.5);
   tensorImg=tensorImg.sub(offset);
+  
   // tensorImg.print();
   var features=model1.predict(tensorImg);
   // features.print();
