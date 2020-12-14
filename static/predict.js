@@ -36,6 +36,7 @@ function fileSelectHandler(e) {
   }
 }
 
+
 //========================================================================
 // Web page elements for functions to use
 //========================================================================
@@ -67,13 +68,51 @@ async function predict() {
     return;
   }
 
-  let tensorImg = tf.browser.fromPixels(imagePreview).resizeNearestNeighbor([224, 224]).toFloat().expandDims();
+  // let meanImageNetRGB = tf.tensor1d([123.68, 116.779, 103.939]);
+  // let tensor = tf.browser.fromPixels(imagePreview)
+  //   .resizeNearestNeighbor([224, 224])
+  //   .toFloat()
+  //   .sub(meanImageNetRGB)
+  //   .reverse(2)
+  //   .expandDims();
+
+  let tensorImg = tf.browser.fromPixels(imagePreview).resizeNearestNeighbor([224, 224]).toFloat();
   tensorImg=tf.reverse(tensorImg, -1);
-  let offset = tf.scalar(127.5);
+  let offset = tf.scalar(128);
   tensorImg=tensorImg.sub(offset);
+  tensorImg=tensorImg.expandDims();
+
+  // let meanImageNetRGB = {
+  //   red: 123.68,
+  //   green: 116.779,
+  //   blue: 103.939
+  // };
+
+  // let indices = [
+  //   tf.tensor1d([0], "int32"),
+  //   tf.tensor1d([1], "int32"),
+  //   tf.tensor1d([2], "int32")
+  // ];
+
+  // let centeredRGB = {
+  //   red: tf.gather(tensorImg, indices[0], 2)
+  //       .sub(tf.scalar(meanImageNetRGB.red))
+  //       .reshape([50176]),
+  //   green: tf.gather(tensorImg, indices[1], 2)
+  //       .sub(tf.scalar(meanImageNetRGB.green))
+  //       .reshape([50176]),
+  //   blue: tf.gather(tensorImg, indices[2], 2)
+  //       .sub(tf.scalar(meanImageNetRGB.blue))
+  //       .reshape([50176])
+  // };
+
+
+  // let processedTensor = tf.stack([
+  //     centeredRGB.red, centeredRGB.green, centeredRGB.blue], 1).reshape([224, 224, 3]).reverse(2).expandDims();
+ 
   
   // tensorImg.print();
-  var features=model1.predict(tensorImg);
+  var features=await model1.predict(tensorImg);
   // features.print();
   // var list = new ArrayList;
   var in_txt="startseq";
