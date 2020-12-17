@@ -1,0 +1,221 @@
+//https://github.com/ageitgey/node-unfluff
+
+var m = new Map();
+m.set(0, "Agree");
+m.set(1, "Disagree");
+m.set(2, "Discuss");
+m.set(3, "Unrelated");
+
+loaded = 0;
+
+async function compute(sentences) {
+  //input=await getInput();
+
+  if (loaded == 0) {
+    model = await tf.loadLayersModel("/model.json");
+    console.log("MODEL LOADED");
+
+    encoder = await use.load();
+    console.log("ENCODER LOADED");
+    loaded = 1;
+  }
+
+  const emb = await encoder.embed(sentences);
+  var a = emb.arraySync();
+  const a1 = tf.tensor(a[0]);
+  const b1 = a1.reshape([1, 512]);
+  const a2 = tf.tensor(a[1]);
+  const b2 = a2.reshape([1, 512]);
+  // b1.print();                 // embedding of first sentence
+  // console.log(b1.shape);
+  // b2.print();                // embedding of second sentence
+  // console.log(b2.shape);
+  var cos_sim = tf.dot(a[0], a[1]);
+  console.log("Cosine Similarity " + cos_sim);
+  const simi = cos_sim.reshape([1, 1]);
+  // console.log(simi.shape);
+  // simi.print();          // cosine similarity of both sentence
+  const concatenated_embedding = tf.concat([b1, simi, b2], 1);
+  // concatenated_embedding.print();
+  // console.log(concatenated_embedding.shape);
+  // console.log(model);
+  prediction = model.predict(concatenated_embedding).arraySync();
+  prediction = tf.tensor(prediction);
+  //prediction.print();
+  var idx = tf.argMax(prediction, 1);
+  idx = idx.arraySync();
+  console.log("Output  ------  " + m.get(idx[0]));
+
+  out = await prediction.array().then((array) => (y = array));
+  return out[0];
+}
+
+async function printOutput(text) {
+  document.getElementById("output").innerHTML = "<h3>" + text + " </h3>";
+}
+
+async function getRelatedArticle(headline) {
+  u = "/relatedNews?headline='" + headline + "'";
+
+  const response = await fetch(u, {
+    methods: "GET",
+  });
+  // console.log(u);
+  var data = await response.json();
+  return data;
+}
+
+async function getStance(user_article, relatedArticle) {
+  o = [0, 0, 0, 0];
+  tot = 0;
+
+  let input = [user_article, ""];
+
+  for (var i = 0; i < Math.min(2, relatedArticle.totalResults); i++) {
+    input[1] = relatedArticle.articles[i].content;
+    x = await compute(input);
+    let j = 0;
+    for (; j < 4; j++) o[j] += x[j];
+    tot += 1;
+    console.log(i);
+    console.log(relatedArticle.totalResults);
+  }
+
+  mx = -1;
+  id = -1;
+  for (i = 0; i < 4; i++) {
+    if (o[i] > mx) {
+      mx = o[i];
+      id = i;
+    }
+  }
+
+  console.log(m.get(id));
+  console.log(id);
+  return m.get(id);
+}
+
+async function solveText() {
+  resetTextOutput();
+  resetUrlInput();
+  resetUrlOutput("hidden");
+
+  relatedArticle = await getRelatedArticle(
+    document.getElementsByName("headline")[0].value
+  );
+  user_article = document.getElementsByName("article")[0].value;
+
+  text = await getStance(user_article, relatedArticle);
+
+  await printOutput(text);
+  console.log(text);
+}
+
+async function getParseData(url) {
+  var u = "/parseUrl?u=" + url + "";
+
+  const response = await fetch(u, {
+    methods: "GET",
+  });
+  console.log(u);
+  var data = await response.json();
+  return data;
+}
+
+async function solveUrl() {
+  resetTextInput();
+  resetTextOutput();
+  resetUrlOutput("visible");
+  url = document.getElementsByName("url")[0].value;
+  console.log(url);
+
+  // u='https://timesofindia.indiatimes.com/city/lucknow';
+  //console.log(u);
+  data = await getParseData(url);
+  console.log(data);
+  console.log("solveUrl");
+
+  await showUrlTitle(data.title);
+  await showUrlText(data.text);
+  await showUrlImage(data.image);
+
+  var relatedArticle = await getRelatedArticle(data.title);
+  var user_article = data.text;
+
+  await showUrlRelatedArticle(relatedArticle);
+
+  var text = await getStance(user_article, relatedArticle);
+
+  await printUrlOutput(text);
+  window.scrollTo(0,document.body.scrollHeight);      // auto scroll to bottom
+  console.log(text);
+
+  // const proxyurl = "https://cors-anywhere.herokuapp.com/";
+  // const url = "https://example.com"; // site that doesn’t send Access-Control-*
+  // await fetch(proxyurl + u) // https://cors-anywhere.herokuapp.com/https://example.com
+  // .then(response => data=response.text())
+  // .catch(() => console.log("Can’t access " + u + " response. Blocked by browser?"))
+  // await data.then(function(r){html=r;})
+
+  // console.log(html);
+}
+
+async function showUrlTitle(text) {
+  document.getElementById("utitle").textContent = text;
+}
+
+async function showUrlText(text) {
+  document.getElementById("utext").textContent = text;
+}
+
+async function showUrlImage(imagelink) {
+  document.getElementById("image").innerHTML =
+    "<img src='" +
+    imagelink +
+    "' class='card-img-top' style='height:200px;width:100%;'>";
+}
+
+async function printUrlOutput(text) {
+  document.getElementById("uoutput").innerHTML = "<h2>" + text + "</h2>";
+}
+
+async function showUrlRelatedArticle(relatedArticle) {
+  for (var i = 0; i < Math.min(2, relatedArticle.totalResults); i++) {
+    var title = relatedArticle.articles[i].title;
+    var url = relatedArticle.articles[i].url;
+    console.log(title);
+    console.log(url);
+
+    document.getElementById("relatedNews").innerHTML +=
+      `
+      <br><br>
+      <a href='` +
+      url +
+      `'>
+        ` +
+      title +
+      `
+      </a>`;
+  }
+}
+
+function resetTextInput() {
+  document.getElementById("headline").value = "";
+  document.getElementById("article").value = "";
+}
+
+function resetTextOutput() {
+  document.getElementById("output").innerHTML = "";
+}
+
+function resetUrlInput() {
+  document.getElementById("url").value = "";
+}
+function resetUrlOutput(visibility) {
+  document.getElementsByClassName("child1")[0].style.visibility = visibility;
+  document.getElementById("utitle").textContent = "";
+  document.getElementById("image").innerHTML = "";
+  document.getElementById("utext").textContent = "";
+  document.getElementById("relatedNews").innerHTML = "";
+  document.getElementById("uoutput").textContent = "";
+}

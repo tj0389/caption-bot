@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)https://fake-%2Dnews-%2Ddetection.herokuapp.com/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title></title>
+    <script src="./2_files/jquery.min.js.download"></script>
+    <link rel="stylesheet" href="./2_files/bootstrap.min.css" integrity="sha384-qF/QmIAj5ZaYFAeQcrQ6bfVMAh4zZlrGwTPY7T/M+iTTLJqJBJjwwnsE5Y0mV7QK" crossorigin="anonymous">
+    <link rel="stylesheet" href="./2_files/font-awesome.min.css">
+    
+     <script src="./2_files/jquery.min.js(1).download"></script>
+    <script src="./2_files/tf.min.js.download"></script>
+    <script src="./2_files/universal-sentence-encoder"></script>
+    <script src="./2_files/predict.js.download"></script>
+
+    
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="https://fake--news--detection.herokuapp.com/#"> 
+            <legend>
+                Fake News Detection
+            </legend>
+        </a>
+    </nav>
+    <br>
+
+    <div class="container" style="width:100%;">   
+        <fieldset>
+            <div class="form-group row">
+                <div class="col-sm-3"></div>
+                <label for="staticEmail" class="col-sm-2 col-form-label">
+                    Article Headline:
+                </label>
+                <div class="col-sm-7">
+                    <input type="text" id="headline" name="headline" placeholder="headline" required="" style="width:48%;">  
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-3"></div>
+                <label for="staticEmail" class="col-sm-2 col-form-label">
+                    Article Body:
+                </label>
+                <div class="col-sm-7">
+                    <textarea rows="10" cols="50" id="article" name="article" placeholder="text" required=""></textarea>  
+                </div>
+            </div>
+
+             <div class="form-group row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-9">
+                    <button type="button" class="btn btn-primary" onclick="solveText()">Search Entities</button>  
+                </div>
+            </div>
+
+                 
+        </fieldset>
+    </div>  
+
+<div id="loading">
+
+</div>
+
+<div id="output" class="container-fluid text-center"></div>
+
+<br>
+<br>
+
+<div class="jumbotron text-center">
+  <form class="form-inline">
+    <div class="input-group" style="padding-left:28%;">
+      <input name="url" id="url" class="form-control" size="50" required="" placeholder="url">
+      <div class="input-group-btn">
+        <button type="button" onclick="solveUrl()" class="btn btn-danger" value="https://timesofindia.indiatimes.com/city/lucknow">Search by Url</button>
+      </div>
+    </div>
+  </form>
+
+
+
+
+
+  <br>
+
+    <div class="container child1" style="visibility: visible;">   
+        <!-- <fieldset> -->
+            <div class="form-group row">
+                <div class="card" style="width:100%;">
+                       <div id="image" style="margin-left:25%;width:50%;margin-top:5%;"><img src="./2_files/img_1607955810627_968.jpg" class="card-img-top" style="height:200px;width:100%;"></div>
+                       
+                        <div class="card-body">
+                            <h4 class="card-title"><div id="utitle">Himachal Pradesh extends night curfew in 4 districts till January 5</div></h4>
+                            <p class="card-text"></p><div id="utext">For the best experience use inshorts app on your smartphone
+
+The Himachal Pradesh government on Monday decided to continue with night curfew in four COVID-hit districts till January 5. The curfew will be in place from 9 pm to 6 am in Shimla, Mandi, Kangra and Kullu, Parliamentary Affairs Minister Suresh Bhardwaj said. The state imposed a night curfew in these districts on November 24 as coronavirus cases increased.
+
+For the best experience use inshorts app on your smartphone</div><p></p>
+                            <div id="uoutput"><h2>Agree</h2></div>
+                            <p class="card-text"></p><div id="relatedNews">
+      <br><br>
+      <a href="https://news.google.com/articles/CAIiEEkwaaao5tJCZnmdl4hKfgIqGQgEKhAIACoHCAow5dz4CjCO8d4CMJW5iwY?hl=en-US&amp;gl=US&amp;ceid=US%3Aen">
+        Coronavirus: Himachal Pradesh Extends Night Curfew in 4 Districts Till Jan 5, Essential Services Allowed
+      </a>
+      <br><br>
+      <a href="https://news.google.com/articles/CBMihwFodHRwczovL3d3dy5yZXB1YmxpY3dvcmxkLmNvbS9pbmRpYS1uZXdzL2NpdHktbmV3cy9uby1wdWJsaWMtbmV3LXllYXItY2VsZWJyYXRpb24taW4tc2hpbWxhLWFzLW5pZ2h0LWN1cmZldy10by1jb250aW51ZS10aWxsLWphbi01Lmh0bWzSAYsBaHR0cHM6Ly93d3cucmVwdWJsaWN3b3JsZC5jb20vYW1wL2luZGlhLW5ld3MvY2l0eS1uZXdzL25vLXB1YmxpYy1uZXcteWVhci1jZWxlYnJhdGlvbi1pbi1zaGltbGEtYXMtbmlnaHQtY3VyZmV3LXRvLWNvbnRpbnVlLXRpbGwtamFuLTUuaHRtbA?hl=en-US&amp;gl=US&amp;ceid=US%3Aen">
+        No public new year celebration in Shimla as night curfew to continue till Jan 5
+      </a></div><p></p>
+                        </div>
+                </div>
+            </div>  
+    </div>
+</div>
+
+
+
+</body></html>
